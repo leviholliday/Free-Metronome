@@ -8,6 +8,8 @@
     <meta name="theme-color" content="#00d4ff">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0idXJsKCNncmFkaWVudDBfbGluZWFyXzFfMSkiLz4KPHBhdGggZD0iTTE2IDhDMTIuMzE0NyA4IDkgMTEuMzE0NyA5IDE1VjI0QzkgMjcuMzE0NyAxMi4zMTQ3IDMxIDE2IDMxQzE5LjY4NTMgMzEgMjMgMjcuMzE0NyAyMyAyNFYxNUMyMyAxMS4zMTQ3IDE5LjY4NTMgOCAxNiA4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE2IDEwQzEzLjc5MDkgMTAgMTIgMTEuNzkwOSAxMiAxNFYyMkMxMiAyNC4yMDkxIDEzLjc5MDkgMjYgMTYgMjZDMThuMjA5MSAyNiAyMCAyNC4yMDkxIDIwIDIyVjE0QzIwIDExLjc5MDkgMTguMjA5MSAxMCAxNiAxMFoiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8yXzEpIi8+CjxwYXRoIGQ9Ik0xNiAxMkMxNC44OTU0IDEyIDE0IDEyLjg5NTQgMTQgMTRWMjJDMTRgMjMuMTA0NiAxNC44OTU0IDI0IDE2IDI0QzE3LjEwNDYgMjQgMTggMjMuMTA0NiAxOCAyMlYxNEMxOCAxMi44OTU0IDE3LjEwNDYgMTIgMTYgMTJaIiBmaWxsPSJ1cmwoI2dyYWRpZW50MF9saW5lYXJfM18xKSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudDBfbGluZWFyXzFfMSIgeDE9IjAiIHkxPSIwIiB4Mj0iMzIiIHkyPSIzMiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBkNGZmIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZmNmI5ZCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MF9saW5lYXJfMl8xIiB4MT0iMTYiIHkxPSIxMCIgeDI9IjE2IiB5Mj0iMjYiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzAwZDRmZiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZjZiOGRkIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQwX2xpbmVhcl8zXzEiIHgxPSIxNiIgeTE9IjEyIiB4Mj0iMTYiIHkyPSIyNCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWN2b3I9IiMwMGQ0ZmYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmY2YjlkIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         * {
             margin: 0;
@@ -639,7 +641,7 @@
 <body>
     <div class="container">
         <!-- Mobile controls toggle -->
-        <button class="mobile-controls-toggle" onclick="toggleMobileControls()">
+        <button class="mobile-controls-toggle" onclick="toggleMobileControls()" aria-label="Open metronome controls">
             ⚙️
         </button>
         
@@ -873,7 +875,7 @@
                 // Update beat indicator
                 const beatDots = document.querySelectorAll('.beat-dot');
                 beatDots.forEach((dot, index) => {
-                    dot.classList.remove('active');
+                    dot.classList.remove('active', 'accent');
                     if (index === this.currentBeat % this.beatsPerMeasure) {
                         dot.classList.add('active');
                         if (this.accentPattern[index]) {
@@ -1322,6 +1324,12 @@
                 // metronome.stop();
             }
         });
+        // Register service worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
     </script>
 </body>
 </html>
