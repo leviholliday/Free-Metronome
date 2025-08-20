@@ -1,0 +1,946 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #ff6b9d, #ffd93d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #b8bcc8;
+            font-weight: 300;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            flex: 1;
+        }
+
+        .side-column { display: flex; flex-direction: column; gap: 20px; height: fit-content; }
+        .timer-panel { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+
+        .metronome-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+        }
+
+        /* Keep side controls visible on desktop */
+        @media (min-width: 769px) {
+            .controls-panel {
+                position: sticky;
+                top: 20px;
+            }
+        }
+
+        .tempo-display {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .bpm-value {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .bpm-label {
+            font-size: 1.2rem;
+            color: #b8bcc8;
+            letter-spacing: 2px;
+        }
+
+        .visual-metronome {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .pendulum-container {
+            width: 200px;
+            height: 250px;
+            position: relative;
+        }
+
+        .pendulum {
+            width: 5px;
+            height: 190px;
+            background: linear-gradient(to bottom, rgba(255,107,157,0.9), rgba(0,212,255,0.9));
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform-origin: top center;
+            transform: translateX(-50%) rotate(0deg);
+            border-radius: 2px;
+            box-shadow: 0 0 24px rgba(0, 212, 255, 0.35), 0 0 10px rgba(255, 107, 157, 0.25);
+            transition: transform 0.1s ease-out;
+        }
+
+        .pendulum-bob {
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle at 40% 35%, #fff2a8, #ffd93d 40%, #ff6b9d 70%);
+            border-radius: 50%;
+            position: absolute;
+            bottom: -10px;
+            left: -10px;
+            box-shadow: 0 0 24px rgba(255, 217, 61, 0.65);
+        }
+
+        .pendulum-glow {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 240px;
+            background: radial-gradient(ellipse at 50% 10%, rgba(0,212,255,0.18), rgba(0,212,255,0) 60%);
+            filter: blur(8px);
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .tempo-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .tempo-input {
+            width: 90px;
+            text-align: center;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 1rem;
+        }
+
+        .tempo-btn {
+            background: linear-gradient(135deg, #ff6b9d, #8b5cf6);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tempo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .tempo-slider {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .tempo-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .play-stop-btn {
+            background: linear-gradient(135deg, #00d4ff, #0ea5e9);
+            border: none;
+            border-radius: 20px;
+            padding: 15px 40px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .play-stop-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        .play-stop-btn.playing {
+            background: linear-gradient(135deg, #ff6b9d, #ef4444);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        .control-input, .control-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Enhanced select styling */
+        .control-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.18);
+            position: relative;
+            padding-right: 44px;
+        }
+        .control-select-wrapper {
+            position: relative;
+        }
+        .control-select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            transform: translateY(-50%) rotate(45deg);
+            border-right: 2px solid #b8bcc8;
+            border-bottom: 2px solid #b8bcc8;
+            opacity: 0.9;
+            pointer-events: none;
+        }
+        .control-select:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .control-input:focus, .control-select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .subdivision-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .subdivision-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .subdivision-btn.active {
+            background: linear-gradient(135deg, #ffd93d, #ff6b9d);
+            border-color: #ffd93d;
+            box-shadow: 0 5px 15px rgba(255, 217, 61, 0.3);
+        }
+
+        .subdivision-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .tap-tempo-btn {
+            background: linear-gradient(135deg, #ffd93d, #ff8c00);
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            color: #1a1a2e;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 217, 61, 0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .tap-tempo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 217, 61, 0.4);
+        }
+
+        .preset-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .beat-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .beat-dot {
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .beat-dot.active {
+            background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+            transform: scale(1.3);
+        }
+
+        .beat-dot.accent {
+            background: linear-gradient(135deg, #ffd93d, #ff6b9d);
+        }
+
+        .accent-pattern {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .accent-beat {
+            width: 25px;
+            height: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .accent-beat.accent {
+            background: linear-gradient(135deg, #ffd93d, #ff6b9d);
+            border-color: #ffd93d;
+        }
+
+        /* Desktop improvements */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1400px;
+                padding: 30px;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr 400px;
+                gap: 40px;
+            }
+
+            .metronome-section {
+                padding: 50px;
+            }
+
+            .visual-metronome {
+                height: 350px;
+            }
+
+            .pendulum-container {
+                width: 240px;
+                height: 300px;
+            }
+
+            .pendulum {
+                height: 220px;
+            }
+        }
+
+        /* Tablet - keep current design */
+        @media (min-width: 769px) and (max-width: 1199px) {
+            /* Current tablet design is perfect - no changes needed */
+        }
+
+        /* Mobile phone optimizations */
+        @media (max-width: 768px) {
+            body {
+                background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%);
+            }
+
+            .container {
+                padding: 10px;
+                max-width: 100%;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .header {
+                padding: 15px;
+                margin-bottom: 15px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .metronome-section {
+                padding: 20px;
+                border-radius: 20px;
+                position: relative;
+            }
+
+            .controls-panel {
+                padding: 20px;
+                border-radius: 20px;
+                position: fixed;
+                top: 0;
+                left: -320px;
+                width: 300px;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+                box-shadow: 5px 0 20px rgba(0, 0, 0, 0.5);
+            }
+
+            .controls-panel.open {
+                left: 0;
+            }
+
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .mobile-controls-toggle {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+                border: none;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-controls-toggle:hover {
+                transform: scale(1.05);
+            }
+
+            .bpm-value {
+                font-size: 2.8rem;
+            }
+
+            .visual-metronome {
+                height: 220px;
+                margin-bottom: 20px;
+            }
+
+            .pendulum-container {
+                width: 150px;
+                height: 180px;
+            }
+
+            .pendulum {
+                height: 130px;
+            }
+
+            .tempo-controls {
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .tempo-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+
+            .play-stop-btn {
+                padding: 20px;
+                font-size: 1.5rem;
+                border-radius: 25px;
+                margin-bottom: 20px;
+            }
+
+            .beat-indicator {
+                margin-bottom: 20px;
+            }
+
+            .beat-dot {
+                width: 18px;
+                height: 18px;
+            }
+
+            /* Larger controls for mobile */
+            .control-input, .control-select {
+                padding: 18px;
+                font-size: 1.2rem;
+                border-radius: 18px;
+            }
+
+            .control-label {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            .subdivision-btn {
+                padding: 18px;
+                font-size: 1.1rem;
+                border-radius: 15px;
+            }
+
+            .tap-tempo-btn {
+                padding: 22px;
+                font-size: 1.3rem;
+                border-radius: 20px;
+            }
+
+            .preset-btn {
+                padding: 14px 18px;
+                font-size: 1.1rem;
+            }
+
+            .tempo-preset-btn {
+                padding: 14px;
+                font-size: 1rem;
+            }
+
+            .accent-beat {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            .control-group {
+                margin-bottom: 30px;
+            }
+
+            .controls-panel .control-group:last-child {
+                margin-bottom: 100px; /* More space for bottom navigation */
+            }
+        }
+
+        /* Hide mobile controls on desktop */
+        .mobile-controls-toggle {
+            display: none;
+        }
+
+        .mobile-overlay {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls-toggle {
+                display: flex;
+            }
+        }
+
+        .advanced-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .polyrhythm-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tempo-presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tempo-preset-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tempo-preset-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        /* Theme segmented control */
+        .theme-group {
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .theme-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid transparent;
+            color: #ffffff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 240ms ease, transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+        }
+        .theme-option:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+        .theme-option.selected {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+        .theme-option .icon { font-size: 1.1rem; }
+
+        /* Selected theme hints */
+        .theme-option.selected.theme-ocean {
+            background: linear-gradient(135deg, rgba(0,212,255,0.18), rgba(139,92,246,0.18));
+        }
+        .theme-option.selected.theme-sunset {
+            background: linear-gradient(135deg, rgba(255,107,157,0.18), rgba(255,138,91,0.18));
+        }
+        .theme-option.selected.theme-aurora {
+            background: linear-gradient(135deg, rgba(126,249,197,0.18), rgba(0,212,255,0.18));
+        }
+
+        /* 3D cards + depth */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 300ms ease, box-shadow 300ms ease;
+            box-shadow:
+                0 1px 2px rgba(0,0,0,0.18),
+                0 8px 24px rgba(0,0,0,0.28);
+            will-change: transform;
+        }
+        .card-3d:hover {
+            box-shadow:
+                0 2px 6px rgba(0,0,0,0.2),
+                0 18px 48px rgba(0,0,0,0.35);
+        }
+
+        /* Beat pulse */
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 0px rgba(0,212,255,0.0); }
+            50% { box-shadow: 0 0 24px rgba(0,212,255,0.35); }
+            100% { box-shadow: 0 0 0px rgba(0,212,255,0.0); }
+        }
+        .beat-dot.pulse { animation: glowPulse 280ms ease-out; }
+
+        /* Beat ripple and flash */
+        .bpm-ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: rippleExpand 700ms ease-out forwards;
+            background: radial-gradient(circle, rgba(0,212,255,0.45), rgba(0,212,255,0) 60%);
+            filter: blur(2px);
+        }
+        @keyframes rippleExpand {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(8); }
+        }
+        .metronome-section.beat-flash { box-shadow: 0 0 40px rgba(0,212,255,0.35), 0 25px 50px rgba(0,0,0,0.3); }
+
+        /* Subtle animated background orbs */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        /* Subtle global hue shift for atmosphere */
+        @keyframes hueShift {
+            0% { filter: hue-rotate(-6deg) saturate(105%); }
+            50% { filter: hue-rotate(6deg) saturate(110%); }
+            100% { filter: hue-rotate(-6deg) saturate(105%); }
+        }
+        .bg-orbs { animation: hueShift 180s ease-in-out infinite alternate; }
+
+        /* Fullscreen themed backgrounds */
+        .fullscreen-theme-bg, .fs-theme-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 400ms ease;
+            background-size: cover;
+            background-position: center;
+            filter: saturate(110%);
+        }
+        body.fullscreen-active .fullscreen-theme-bg { opacity: 1; }
+        /* When the metronome panel is fullscreen, use internal bg */
+        .metronome-section .fs-theme-bg { position: absolute; border-radius: 25px; }
+        body.fullscreen-active .metronome-section .fs-theme-bg { opacity: 1; }
+        /* Ocean */
+        body.fullscreen-active:not(.theme-sunset):not(.theme-aurora) .fullscreen-theme-bg,
+        body.fullscreen-active:not(.theme-sunset):not(.theme-aurora) .metronome-section .fs-theme-bg {
+            background-image:
+                radial-gradient(1200px 800px at 70% 20%, rgba(0,212,255,0.18), rgba(0,212,255,0) 60%),
+                radial-gradient(1000px 700px at 20% 80%, rgba(0,120,255,0.12), rgba(0,120,255,0) 60%),
+                linear-gradient(135deg, #04131a, #0a2740 40%, #062034);
+        }
+        /* Sunset */
+        body.fullscreen-active.theme-sunset .fullscreen-theme-bg,
+        body.fullscreen-active.theme-sunset .metronome-section .fs-theme-bg {
+            background-image:
+                radial-gradient(1200px 800px at 70% 20%, rgba(255,107,157,0.22), rgba(255,107,157,0) 60%),
+                radial-gradient(1000px 700px at 20% 80%, rgba(255,165,0,0.18), rgba(255,165,0,0) 60%),
+                linear-gradient(135deg, #1a0b10, #3a1020 40%, #281012);
+        }
+        /* Aurora */
+        body.fullscreen-active.theme-aurora .fullscreen-theme-bg,
+        body.fullscreen-active.theme-aurora .metronome-section .fs-theme-bg {
+            background-image:
+                radial-gradient(1200px 800px at 70% 20%, rgba(126,249,197,0.2), rgba(126,249,197,0) 60%),
+                radial-gradient(1000px 700px at 20% 80%, rgba(139,92,246,0.18), rgba(139,92,246,0) 60%),
+                linear-gradient(135deg, #08120f, #0a1c23 40%, #0c0f24);
+        }
+
+        /* Timer panel visibility: only in fullscreen */
+        .timer-panel { display: none; }
+        body.fullscreen-active .timer-panel {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+            width: auto;
+            min-width: 240px;
+        }
+        .bg-orbs .orb {
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            filter: blur(60px);
+            opacity: 0.25;
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            animation: drift 24s ease-in-out infinite alternate;
+        }
+        .bg-orbs .orb.orb1 {
+            top: -120px; left: -120px;
+            background: radial-gradient(circle at 30% 30%, #00d4ff, transparent 60%),
+                        radial-gradient(circle at 70% 70%, #ff6b9d, transparent 60%);
+        }
+        .bg-orbs .orb.orb2 {
+            bottom: -160px; right: -160px;
+            background: radial-gradient(circle at 70% 30%, #ffd93d, transparent 60%),
+                        radial-gradient(circle at 30% 70%, #8b5cf6, transparent 60%);
+            animation-delay: 4s;
+        }
+        @keyframes drift {
+            from { transform: translate3d(0,0,0) scale(1); }
+            to { transform: translate3d(20px,-30px,0) scale(1.06); }
+        }
+
+        /* Minimal theme presets */
+        .theme-sunset h1 {
+            background: linear-gradient(135deg, #ff8a5b, #ff6b9d, #ffd93d);
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .theme-sunset .play-stop-btn { background: linear-gradient(135deg, #ff6b9d, #ff8a5b); }
+        .theme-sunset .tempo-btn { background: linear-gradient(135deg, #ff6b9d, #ff8a5b); }
+
+        .theme-aurora h1 {
+            background: linear-gradient(135deg, #7ef9c5, #00d4ff, #8b5cf6);
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .theme-aurora .play-stop-btn { background: linear-gradient(135deg, #00d4ff, #8b5cf6); }
+        .theme-aurora .tempo-btn { background: linear-gradient(135deg, #00d4ff, #8b5cf6); }
+
+        /* Respect reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+        }
+
+        /* Fullscreen layout */
+        body.fullscreen-active .header { display: none; }
+        body.fullscreen-active .main-grid { grid-template-columns: 1fr; }
+        body.fullscreen-active .controls-panel { display: none; }
+        body.fullscreen-active .metronome-section { padding: 60px; }
+        body.fullscreen-active .visual-metronome { height: 420px; }
+        body.fullscreen-active .bpm-value { font-size: 5.2rem; text-shadow: 0 0 30px rgba(0,212,255,0.6); }
+        body.fullscreen-active .beat-dot { width: 20px; height: 20px; }
+        body.fullscreen-active .bg-orbs { opacity: 0.9; }
+
+        /* Fullscreen toggle */
+        .fullscreen-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px 14px;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+        }
+        .fullscreen-toggle:hover { background: rgba(255,255,255,0.14); }
+
+        /* Practice timer */
+        .timer { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 10px 0 30px 0; }
+        .timer-display {
+            font-variant-numeric: tabular-nums;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 8px 14px;
+            border-radius: 10px;
+        }
+        .timer-controls { display: flex; gap: 10px; }
+        .timer-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .timer-btn:hover { background: rgba(255,255,255,0.18); }
